@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="d7c2634a-544e-41b3-b42a-287faed5ec07" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="196e72fe-f803-4016-9dc6-7a5971b7994e" >
+		<http:request-connection protocol="HTTPS" host="api.meteostat.net" />
+	</http:request-config>
+	<flow name="meteostat_apiFlow" doc:id="2cbbf195-ec86-4f1a-ad13-12c756eeea68" >
+		<http:listener doc:name="Listener" doc:id="a40c1dd9-4655-483b-b523-fb8064129235" config-ref="HTTP_Listener_config" path="/weather"/>
+		<http:request method="GET" doc:name="Request" doc:id="1d57a37d-8c81-4f8e-b0fd-c62f7c2faeaf" config-ref="HTTP_Request_configuration" path="/v1/history/daily">
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"start" : attributes.queryParams.start,
+	"key" : attributes.queryParams.key,
+	"end" : attributes.queryParams.end,
+	"station" : attributes.queryParams.station
+}]]]></http:query-params>
+		</http:request>
+	</flow>
+</mule>
